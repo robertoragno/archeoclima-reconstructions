@@ -1,8 +1,8 @@
-# ArcheoClima – A Bayesian state-space framework for integrating documentary sources and palaeoclimate simulations: reconstructing temperature and precipitation anomalies in southern Italy (1000–1800 CE)
+# ArcheoClima – Temperature and precipitation anomalies in southern Italy (1000–1800 CE): integrating historical sources with climate simulations
 
 Replication code for:
 
-> Ragno, R. & Goffredo, R. (*under review*). "A Bayesian state-space framework for integrating documentary sources and palaeoclimate simulations: reconstructing temperature and precipitation anomalies in southern Italy (1000–1800 CE)." *Archeologia e Calcolatori*.
+> Ragno, R. & Goffredo, R. (*to be submitted*). "Temperature and precipitation anomalies in southern Italy (1000–1800 CE): integrating historical sources with climate simulations." 
 
 The model integrates CHELSA-TraCE21k palaeoclimate simulations with Pfister-coded documentary sources from the ArcheoClima database, using a Bayesian state-space model with an AR(1) process fit in Stan.
 
