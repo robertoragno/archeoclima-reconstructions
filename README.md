@@ -112,6 +112,8 @@ See `stan/centennial_model.stan` and `R/03_model_prep.R` for full details.
 ## Citation
 
 If you use this code or the ArcheoClima database, please cite the paper (still under review) above and the dataset DOI
+
+
 [![DOI](https://zenodo.org/badge/1185147777.svg)](https://doi.org/10.5281/zenodo.19087807)
 
 
