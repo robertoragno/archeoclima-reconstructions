@@ -95,6 +95,8 @@ The ArcheoClima database (`Database_EN.csv`) is available in this Github reposit
 
 ![The structure of the database showing the relations to the main tables.](/data/raw/Database_Structure/Database_Structure.png)
 
+For more information on the structure of the database please refer to [https://doi.org/10.5281/zenodo.19102067](https://doi.org/10.5281/zenodo.19102067)
+
 ---
 
 ## Model
