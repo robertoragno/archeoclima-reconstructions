@@ -86,7 +86,7 @@ The processed output (`climate_data`) is saved to `data/processed/chelsa_climate
 
 ### ModE-RA / ModE-Sim data (optional)
 
-`R/08_ModE_comparison.R` compares the posterior against the ModE-RA reanalysis and ModE-Sim ensemble (Valler et al. 2022). These NetCDF files are not distributed here. Download them from the WDC Climate Data portal:
+`R/08_ModE_comparison.R` compares the posterior against the ModE-RA reanalysis and ModE-Sim ensemble (Valler et al. 2022, Hand et al. 2023). These NetCDF files are not distributed here. Download them from the WDC Climate Data portal:
 
 - ModE-RA: <https://www.wdc-climate.de/ui/q?hierarchy_steps_ss=ModE-RA_s14203-18501&entry_type_s=Dataset>
 - ModE-Sim: <https://www.wdc-climate.de/ui/q?query=ModE-Sim&entry_type_s=Dataset>

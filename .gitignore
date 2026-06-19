@@ -21,3 +21,4 @@ supplementary.tex
 
 # ModE raw NetCDF files (23 GB; download instructions in R/helpers/mode_processing.R)
 data/raw/ModE/
+.positai

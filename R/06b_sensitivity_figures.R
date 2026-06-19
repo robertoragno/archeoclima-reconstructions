@@ -40,38 +40,36 @@ recon_all <- bind_rows(
 
 # ── Figure ───────────────────────────────────────────────────────────────────
 
-# Each variable gets its canonical color; SD levels are separated into facets
-# so panels are uncluttered and directly comparable across uncertainty levels.
 make_sens_plot <- function(cv, post_col) {
 
   dat <- recon_all |>
     filter(climate_var == cv) |>
     mutate(sd_label = factor(
       paste0("s.d. = ", chelsa_sd_value,
-             if (cv == "temperature") " \u00B0C" else "%"),
+             if (cv == "temperature") " °C" else "%"),
       levels = paste0("s.d. = ", grid[[cv]],
-                      if (cv == "temperature") " \u00B0C" else "%")
+                      if (cv == "temperature") " °C" else "%")
     ))
 
-  # chelsa_ref has no sd_label column -> ggplot repeats it in every facet
   chelsa_ref <- dat |> distinct(century, chelsa_prior)
 
-  y_lab <- if (cv == "temperature") "Temperature anomaly (\u00B0C)"
-           else "Precipitation anomaly (%)"
-  title <- if (cv == "temperature") "Temperature: sensitivity to assumed CHELSA uncertainty"
-           else "Precipitation: sensitivity to assumed CHELSA uncertainty"
+  y_lab <- if (cv == "temperature") "Anomaly (°C)" else "Anomaly (%)"
+  title <- if (cv == "temperature") "Temperature" else "Precipitation"
 
   ggplot(dat, aes(x = century, y = posterior_median)) +
     geom_hline(yintercept = 0, colour = "black", alpha = 0.3) +
-    geom_line(data = chelsa_ref, aes(x = century, y = chelsa_prior),
-              colour = "grey50", linetype = "dashed", linewidth = 1,
-              inherit.aes = FALSE) +
+    geom_ribbon(aes(ymin = q025, ymax = q975, fill = "95% credible interval"),
+                alpha = 0.22, colour = NA) +
+    geom_line(aes(colour = "Bayesian posterior", linetype = "Bayesian posterior"),
+              linewidth = 1.0) +
+    geom_point(colour = post_col, size = 2.5) +
+    geom_line(data = chelsa_ref,
+              aes(x = century, y = chelsa_prior,
+                  colour = "CHELSA-TraCE21k prior",
+                  linetype = "CHELSA-TraCE21k prior"),
+              linewidth = 1, inherit.aes = FALSE) +
     geom_point(data = chelsa_ref, aes(x = century, y = chelsa_prior),
                colour = "grey50", size = 2.5, inherit.aes = FALSE) +
-    geom_ribbon(aes(ymin = q025, ymax = q975),
-                fill = post_col, alpha = 0.22, colour = NA) +
-    geom_line(colour = post_col, linewidth = 1.0) +
-    geom_point(colour = post_col, size = 2.5) +
     facet_wrap(~ sd_label, nrow = 1) +
     scale_x_continuous(breaks = seq(1000, 1800, by = 200)) +
     scale_y_continuous(
@@ -80,19 +78,34 @@ make_sens_plot <- function(cv, post_col) {
       else
         scales::pretty_breaks(n = 6)
     ) +
-    labs(x = "Century", y = y_lab, title = title,
-         caption = paste0(
-           "Grey dashed: CHELSA-TraCE21k prior. Shading: 95% credible interval.\n",
-           "Each facet shows the posterior under a different assumed simulation uncertainty."
-         )) +
+    scale_colour_manual(
+      name   = "",
+      values = c("Bayesian posterior"   = post_col,
+                 "CHELSA-TraCE21k prior" = "grey50")
+    ) +
+    scale_linetype_manual(
+      name   = "",
+      values = c("Bayesian posterior"   = "solid",
+                 "CHELSA-TraCE21k prior" = "dashed")
+    ) +
+    scale_fill_manual(
+      name   = "",
+      values = c("95% credible interval" = post_col),
+      guide  = guide_legend(
+        override.aes = list(alpha = 0.22, colour = NA, linetype = 0, size = 5)
+      )
+    ) +
+    labs(x = "Century", y = y_lab, title = title) +
     theme_tidybayes() +
     theme(
-      text            = element_text(size = 13),
-      plot.title      = element_text(face = "bold", size = 14),
-      strip.text      = element_text(size = 12, face = "bold"),
-      axis.text.x     = element_text(angle = 45, hjust = 1),
-      plot.caption    = element_text(size = 8, hjust = 0),
-      plot.margin     = margin(10, 10, 10, 10)
+      text             = element_text(size = 13),
+      plot.title       = element_text(face = "bold", size = 14),
+      strip.text       = element_text(size = 12, face = "bold"),
+      axis.text.x      = element_text(angle = 45, hjust = 1),
+      plot.margin      = margin(10, 10, 10, 10),
+      legend.position  = "bottom",
+      legend.key.width = unit(1.5, "cm"),
+      legend.text      = element_text(size = 11)
     )
 }
 
