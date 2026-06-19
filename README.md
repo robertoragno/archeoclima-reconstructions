@@ -1,8 +1,8 @@
-# ArcheoClima – Temperature and precipitation anomalies in southern Italy (1000–1800 CE): integrating historical sources with climate simulations
+# ArcheoClima – Integrating historical sources with climate simulations: temperature and precipitation anomalies in southern Italy (1000–1800 CE): 
 
 Replication code for:
 
-> Ragno, R. & Goffredo, R. (*to be submitted*). "Temperature and precipitation anomalies in southern Italy (1000–1800 CE): integrating historical sources with climate simulations." 
+> Ragno, R. & Goffredo, R. (*under review*). "Integrating historical sources with climate simulations: temperature and precipitation anomalies in southern Italy (1000–1800 CE)." 
 
 The model integrates CHELSA-TraCE21k palaeoclimate simulations with Pfister-coded documentary sources from the ArcheoClima database, using a Bayesian state-space model with an AR(1) process fit in Stan.
 
@@ -179,5 +179,5 @@ If you use this code or the ArcheoClima database, please cite the paper (still u
 
 ## Disclaimer
 
-Given the high volume of work at the moment, the R scripts were refined using an AI tool to make sure they are readable and well-commented.
+Given the high volume of work at the moment, the R scripts were refined using an AI tool (Github Copilot) to make sure they are readable and well-commented.
 I have fully tested the scripts after refinement, but if you encounter any issues please let me know by opening an issue in this repository.
