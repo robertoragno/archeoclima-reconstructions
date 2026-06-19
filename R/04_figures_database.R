@@ -103,11 +103,11 @@ p1 <- ggplot(event_counts,
     x = NULL,
     y = "Number of events"
   ) +
-  theme_minimal(base_size = 12) +
+  theme_minimal(base_size = 13) +
   theme(
     plot.title       = element_text(face = "bold", size = 14),
-    plot.subtitle    = element_text(size = 11, colour = "grey30"),
-    axis.text.x      = element_text(angle = 45, hjust = 1, size = 9),
+    plot.subtitle    = element_text(size = 12, colour = "grey30"),
+    axis.text.x      = element_text(angle = 45, hjust = 1, size = 10),
     panel.grid.major.x = element_blank(),
     panel.grid.minor   = element_blank()
   )
@@ -138,7 +138,7 @@ p2 <- ggplot(century_counts, aes(x = Century, y = n)) +
   ) +
   theme_minimal(base_size = 13) +
   theme(
-    plot.title         = element_text(face = "bold", size = 16),
+    plot.title         = element_text(face = "bold", size = 14),
     axis.title.x       = element_text(margin = margin(t = 8)),
     axis.title.y       = element_text(margin = margin(r = 8)),
     axis.text          = element_text(size = 11),
@@ -174,7 +174,7 @@ p3 <- ggplot(macro_counts,
   scale_fill_manual(values = event_colors, guide = "none") +
   coord_flip() +
   labs(title = "Events by macro-category", x = NULL, y = "Number of events") +
-  theme_minimal(base_size = 12) +
+  theme_minimal(base_size = 13) +
   theme(
     plot.title         = element_text(face = "bold", size = 14),
     panel.grid.major.y = element_blank()
@@ -202,10 +202,10 @@ p4 <- ggplot(heatmap_data,
     x = "Century",
     y = NULL
   ) +
-  theme_minimal(base_size = 11) +
+  theme_minimal(base_size = 13) +
   theme(
-    plot.title       = element_text(face = "bold", size = 13),
-    axis.text.y      = element_text(size = 9),
+    plot.title       = element_text(face = "bold", size = 14),
+    axis.text.y      = element_text(size = 10),
     panel.grid       = element_blank(),
     legend.position  = "right"
   )

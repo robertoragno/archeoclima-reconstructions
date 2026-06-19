@@ -90,7 +90,7 @@ plot_model_results <- function(results, climate_var = "temperature") {
         "Numbers indicate documentary events per century"
       )
     ) +
-    theme_tidybayes() +
+    theme_tidybayes() + theme(text = element_text(size = 13)) +
     theme(
       plot.title      = element_text(face = "bold", size = 14),
       legend.position = "none",
@@ -124,7 +124,7 @@ plot_model_results <- function(results, climate_var = "temperature") {
       y        = shift_y_lab,
       caption  = shift_caption
     ) +
-    theme_tidybayes() +
+    theme_tidybayes() + theme(text = element_text(size = 13)) +
     theme(
       plot.title   = element_text(face = "bold", size = 13),
       plot.margin  = margin(10, 10, 20, 10),
@@ -150,7 +150,7 @@ plot_model_results <- function(results, climate_var = "temperature") {
         x        = expression(rho),
         y        = "Density"
       ) +
-      theme_tidybayes() +
+      theme_tidybayes() + theme(text = element_text(size = 13)) +
       theme(plot.title = element_text(face = "bold", size = 13))
   }
 

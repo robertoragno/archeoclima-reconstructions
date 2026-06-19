@@ -1,0 +1,7 @@
+variable,comparison,n,pearson_r,mean_abs_diff
+temperature (°C),Posterior vs ModE-RA,5,0.6709462844903794,0.0880122638158429
+temperature (°C),Posterior vs ModE-Sim,5,0.7588900747432569,0.09148298247414162
+temperature (°C),CHELSA vs ModE-Sim,5,-0.06640716279358279,0.16081247227168696
+precipitation (%),Posterior vs ModE-RA,5,-0.14374996538218282,6.204356364057005
+precipitation (%),Posterior vs ModE-Sim,5,-0.2047837872437849,0.9317855089003576
+precipitation (%),CHELSA vs ModE-Sim,5,-0.8663034147583256,3.2263939767655176
