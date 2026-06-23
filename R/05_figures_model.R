@@ -32,22 +32,12 @@ plot_model_results <- function(results, climate_var = "temperature") {
     shift_y_lab   <- "Shift (\u00B0C)"
     title         <- "Reconstruction of temperature anomalies"
     shift_title   <- "Shift from CHELSA estimates (temperature)"
-    shift_caption <- paste0(
-      "Positive = sources suggest warmer conditions than CHELSA\n",
-      "Negative = sources suggest colder conditions than CHELSA\n",
-      "Hollow points = centuries without documentary evidence"
-    )
     posterior_col <- "#E69F00"
   } else {
     y_lab         <- "Precipitation anomaly (%)"
     shift_y_lab   <- "Shift (%)"
     title         <- "Reconstruction of precipitation anomalies"
     shift_title   <- "Shift from CHELSA estimates (precipitation)"
-    shift_caption <- paste0(
-      "Positive = sources suggest wetter conditions than CHELSA\n",
-      "Negative = sources suggest drier conditions than CHELSA\n",
-      "Hollow points = centuries without documentary evidence"
-    )
     posterior_col <- "skyblue4"
   }
 
@@ -63,39 +53,59 @@ plot_model_results <- function(results, climate_var = "temperature") {
     rename(.value = posterior_median, .lower = q025, .upper = q975) |>
     mutate(has_events = n_events > 0L)
 
-  p_main <- ggplot(recon, aes(x = century, y = .value)) +
-    # CHELSA prior
-    geom_line(aes(y = chelsa_prior),
-              colour = "grey50", linetype = "dashed", linewidth = 1) +
-    geom_point(aes(y = chelsa_prior), colour = "grey50", size = 3) +
-    # Posterior ribbon + line
-    geom_lineribbon(aes(ymin = .lower, ymax = .upper),
-                    fill = posterior_col, alpha = 0.25,
-                    colour = posterior_col, linewidth = 1.1) +
-    # Points: filled if documentary evidence exists, hollow otherwise
-    geom_point(data = filter(recon,  has_events), aes(size = n_events), colour = posterior_col) +
-    geom_point(data = filter(recon, !has_events), shape = 21, size = 3,
-               colour = posterior_col, fill = "white", stroke = 1.2) +
-    geom_text(aes(label = n_events), nudge_y = 0.25, size = 3, colour = posterior_col) +
+  p_main <- ggplot(recon, aes(x = century)) +
     geom_hline(yintercept = 0, colour = "black", alpha = 0.3) +
+    # Posterior ribbon mapped to fill for legend entry
+    geom_ribbon(aes(ymin = .lower, ymax = .upper,
+                    fill = "Posterior median (shading: 95% CI)"),
+                alpha = 0.25, colour = NA) +
+    # CHELSA prior mapped to colour for legend entry
+    geom_line(aes(y = chelsa_prior, colour = "CHELSA-TraCE21k prior"),
+              linetype = "dashed", linewidth = 1) +
+    geom_point(aes(y = chelsa_prior, colour = "CHELSA-TraCE21k prior"), size = 3) +
+    # Posterior line mapped to colour
+    geom_line(aes(y = .value, colour = "Posterior median (shading: 95% CI)"),
+              linewidth = 1.1) +
+    # Points sized by n_events (fixed colour, no legend)
+    geom_point(data = filter(recon,  has_events),
+               aes(y = .value, size = n_events), colour = posterior_col) +
+    geom_point(data = filter(recon, !has_events),
+               aes(y = .value), shape = 21, size = 3,
+               colour = posterior_col, fill = "white", stroke = 1.2) +
+    geom_text(data = filter(recon, has_events),
+              aes(y = .value, label = n_events),
+              nudge_y = 0.25, size = 3, colour = posterior_col) +
     x_theme +
-    scale_size_continuous(range = c(1, 5), name = "Documentary\nevents") +
-    scale_fill_distiller(palette = "Blues", direction = 1) +
-    labs(
-      title   = title,
-      x       = "Century",
-      y       = y_lab,
-      caption = paste0(
-        "Grey dashed: CHELSA-TraCE prior | Coloured: posterior (updated by documentary sources)\n",
-        "Numbers indicate documentary events per century"
-      )
+    scale_colour_manual(
+      name   = NULL,
+      values = c("CHELSA-TraCE21k prior" = "grey50",
+                 "Posterior median (shading: 95% CI)" = posterior_col)
     ) +
-    theme_tidybayes() + theme(text = element_text(size = 13)) +
+    scale_fill_manual(
+      name   = NULL,
+      values = c("Posterior median (shading: 95% CI)" = posterior_col)
+    ) +
+    scale_size_continuous(range = c(1, 5), guide = "none") +
+    guides(
+      colour = guide_legend(
+        nrow = 1,
+        override.aes = list(
+          linetype  = c("dashed", "solid"),
+          linewidth = c(1, 1.1),
+          shape     = c(16, NA),
+          fill      = c(NA, NA)
+        )
+      ),
+      fill = "none"
+    ) +
+    labs(title = title, x = "Century", y = y_lab, tag = "A") +
+    theme_tidybayes() +
     theme(
-      plot.title      = element_text(face = "bold", size = 14),
-      legend.position = "none",
-      plot.caption    = element_text(size = 8, hjust = 0),
-      plot.margin     = margin(10, 10, 20, 10)
+      text            = element_text(size = 14),
+      plot.title      = element_text(face = "bold", size = 18),
+      plot.tag        = element_text(face = "bold", size = 16),
+      legend.position = "bottom",
+      plot.margin     = margin(10, 10, 10, 10)
     )
 
   # ── Plot 2: Shift from CHELSA ──────────────────────────────────────────────
@@ -106,29 +116,51 @@ plot_model_results <- function(results, climate_var = "temperature") {
 
   shift_col <- "#bf4342"
 
-  p_shift <- ggplot(shift, aes(x = century, y = .value)) +
+  p_shift <- ggplot(shift, aes(x = century)) +
     geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
-    geom_lineribbon(aes(ymin = .lower, ymax = .upper),
-                    fill = shift_col, alpha = 0.3,
-                    colour = shift_col, linewidth = 1.1) +
-    geom_point(data = filter(shift,  has_events), aes(size = n_events), colour = shift_col) +
-    geom_point(data = filter(shift, !has_events), shape = 21, size = 3,
+    # Ribbon mapped to fill for legend entry
+    geom_ribbon(aes(ymin = .lower, ymax = .upper,
+                    fill = "Posterior shift (shading: 95% CI)"),
+                alpha = 0.3, colour = NA) +
+    geom_line(aes(y = .value, colour = "Posterior shift (shading: 95% CI)"),
+              linewidth = 1.1) +
+    geom_point(data = filter(shift,  has_events),
+               aes(y = .value, size = n_events), colour = shift_col) +
+    geom_point(data = filter(shift, !has_events),
+               aes(y = .value), shape = 21, size = 3,
                colour = shift_col, fill = "white", stroke = 1.2) +
-    geom_text(aes(label = n_events), nudge_y = 0.25, size = 3, colour = shift_col) +
+    geom_text(data = filter(shift, has_events),
+              aes(y = .value, label = n_events),
+              nudge_y = 0.25, size = 3, colour = shift_col) +
     x_theme +
+    scale_colour_manual(name = NULL, values = c("Posterior shift (shading: 95% CI)" = shift_col)) +
+    scale_fill_manual(  name = NULL, values = c("Posterior shift (shading: 95% CI)" = shift_col)) +
     scale_size_continuous(range = c(2, 6), guide = "none") +
+    guides(
+      colour = guide_legend(
+        nrow = 1,
+        override.aes = list(
+          fill      = NA,
+          linewidth = 1.1,
+          shape     = NA
+        )
+      ),
+      fill = "none"
+    ) +
     labs(
       title    = shift_title,
       subtitle = "Informational contribution of documentary sources relative to the prior",
       x        = "Century",
       y        = shift_y_lab,
-      caption  = shift_caption
+      tag      = "B"
     ) +
-    theme_tidybayes() + theme(text = element_text(size = 13)) +
+    theme_tidybayes() +
     theme(
-      plot.title   = element_text(face = "bold", size = 13),
-      plot.margin  = margin(10, 10, 20, 10),
-      plot.caption = element_text(size = 8, hjust = 0)
+      text            = element_text(size = 14),
+      plot.title      = element_text(face = "bold", size = 18),
+      plot.tag        = element_text(face = "bold", size = 16),
+      legend.position = "bottom",
+      plot.margin     = margin(10, 10, 10, 10)
     )
 
   # ── Plot 3: rho posterior vs prior ────────────────────────────────────────

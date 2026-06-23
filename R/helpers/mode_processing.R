@@ -38,7 +38,31 @@ cache_names <- c("ra_temp_mean", "ra_temp_std", "ra_prec_mean", "ra_prec_std",
 cache_paths <- file.path(cache_dir, paste0(cache_names, ".csv"))
 cache_complete <- all(file.exists(cache_paths))
 
-# ---- NetCDF helpers (only defined if we actually need them) ------------------
+# ---- Aggregation helpers (always defined) ------------------------------------
+
+to_annual_temp <- function(df) {
+  df |> group_by(year) |> filter(n() == 12L) |>
+    summarise(value_annual = mean(value), .groups = "drop")
+}
+
+to_annual_precip <- function(df) {
+  month_days <- c(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+  df |>
+    mutate(mm_month = value * month_days[month] * 86400) |>
+    group_by(year) |> filter(n() == 12L) |>
+    summarise(value_annual = sum(mm_month), .groups = "drop")
+}
+
+to_centennial <- function(df, min_years = 50L) {
+  df |>
+    mutate(century = as.integer(floor(year / 100) * 100)) |>
+    group_by(century) |>
+    summarise(value_cent = mean(value_annual), n_years = n(),
+              partial = n() < 100L, .groups = "drop") |>
+    filter(n_years >= min_years, century >= 1000L, century <= 1800L)
+}
+
+# ---- NetCDF helpers (only needed when cache is missing) ----------------------
 
 if (!cache_complete) {
 
@@ -109,28 +133,6 @@ if (!cache_complete) {
     result
   }
 
-  to_annual_temp <- function(df) {
-    df |> group_by(year) |> filter(n() == 12L) |>
-      summarise(value_annual = mean(value), .groups = "drop")
-  }
-
-  to_annual_precip <- function(df) {
-    month_days <- c(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
-    df |>
-      mutate(mm_month = value * month_days[month] * 86400) |>
-      group_by(year) |> filter(n() == 12L) |>
-      summarise(value_annual = sum(mm_month), .groups = "drop")
-  }
-
-  to_centennial <- function(df, min_years = 50L) {
-    df |>
-      mutate(century = as.integer(floor(year / 100) * 100)) |>
-      group_by(century) |>
-      summarise(value_cent = mean(value_annual), n_years = n(),
-                partial = n() < 100L, .groups = "drop") |>
-      filter(n_years >= min_years, century >= 1000L, century <= 1800L)
-  }
-
   message("--- Building ModE cache from raw NetCDFs ---")
   message("ModE-RA:")
   ra_temp <- to_centennial(to_annual_temp(extract_monthly_ts(ra_files$temp_mean, "temp2",   "ra_temp_mean")))
@@ -149,15 +151,15 @@ if (!cache_complete) {
 } else {
 
   message("Loading ModE cache ...")
-  load_cent <- function(name) readr::read_csv(file.path(cache_dir, paste0(name, ".csv")), show_col_types = FALSE)
+  load_monthly <- function(name) readr::read_csv(file.path(cache_dir, paste0(name, ".csv")), show_col_types = FALSE)
 
-  ra_temp <- load_cent("ra_temp_mean")
-  ra_tstd <- load_cent("ra_temp_std")  |> rename(std_cent = value_cent)
-  ra_prec <- load_cent("ra_prec_mean")
-  ra_pstd <- load_cent("ra_prec_std")  |> rename(std_cent = value_cent)
-  sim_temp <- load_cent("sim_temp_mean")
-  sim_tstd <- load_cent("sim_temp_std") |> rename(std_cent = value_cent)
-  sim_prec <- load_cent("sim_prec_mean")
-  sim_pstd <- load_cent("sim_prec_std") |> rename(std_cent = value_cent)
+  ra_temp  <- to_centennial(to_annual_temp(load_monthly("ra_temp_mean")))
+  ra_tstd  <- to_centennial(to_annual_temp(load_monthly("ra_temp_std")))  |> rename(std_cent = value_cent)
+  ra_prec  <- to_centennial(to_annual_precip(load_monthly("ra_prec_mean")))
+  ra_pstd  <- to_centennial(to_annual_precip(load_monthly("ra_prec_std")))  |> rename(std_cent = value_cent)
+  sim_temp <- to_centennial(to_annual_temp(load_monthly("sim_temp_mean")))
+  sim_tstd <- to_centennial(to_annual_temp(load_monthly("sim_temp_std"))) |> rename(std_cent = value_cent)
+  sim_prec <- to_centennial(to_annual_precip(load_monthly("sim_prec_mean")))
+  sim_pstd <- to_centennial(to_annual_precip(load_monthly("sim_prec_std"))) |> rename(std_cent = value_cent)
 
 }

@@ -16,7 +16,6 @@ Reviews.txt
 
 # Working notes and supplementary draft (gitignored; updated as suggestions evolve)
 manuscript_changes.md
-manuscript_changes.tex
 supplementary.tex
 
 # ModE raw NetCDF files (23 GB; download instructions in R/helpers/mode_processing.R)

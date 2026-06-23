@@ -168,9 +168,9 @@ agree <- function(x, y, label, var) {
 }
 
 metrics_all <- bind_rows(
-  agree(wide_temp$Posterior, wide_temp$`ModE-RA`,  "Posterior vs ModE-RA",  "temperature (°C)"),
-  agree(wide_temp$Posterior, wide_temp$`ModE-Sim`, "Posterior vs ModE-Sim", "temperature (°C)"),
-  agree(wide_temp$CHELSA,    wide_temp$`ModE-Sim`, "CHELSA vs ModE-Sim",    "temperature (°C)"),
+  agree(wide_temp$Posterior, wide_temp$`ModE-RA`,  "Posterior vs ModE-RA",  "temperature (\u00B0C)"),
+  agree(wide_temp$Posterior, wide_temp$`ModE-Sim`, "Posterior vs ModE-Sim", "temperature (\u00B0C)"),
+  agree(wide_temp$CHELSA,    wide_temp$`ModE-Sim`, "CHELSA vs ModE-Sim",    "temperature (\u00B0C)"),
   agree(wide_prec$Posterior, wide_prec$`ModE-RA`,  "Posterior vs ModE-RA",  "precipitation (%)"),
   agree(wide_prec$Posterior, wide_prec$`ModE-Sim`, "Posterior vs ModE-Sim", "precipitation (%)"),
   agree(wide_prec$CHELSA,    wide_prec$`ModE-Sim`, "CHELSA vs ModE-Sim",    "precipitation (%)")
@@ -186,10 +186,7 @@ MODE_COL_RA  <- "grey30"
 MODE_COL_SIM <- "grey65"
 CHELSA_COL   <- "grey50"
 
-shared_caption <-
-  "All series centred on own 1500-1800 mean. Posterior: 95% CI. CHELSA: model prior (dashed). ModE bands: +/-1 ensemble s.d."
-
-make_comp_plot <- function(cv, y_lab, title, post_col, caption_extra = "") {
+make_comp_plot <- function(cv, y_lab, title, post_col) {
   dat        <- comparison_all |> filter(variable == cv)
   dat_chelsa <- dat |> filter(series == "CHELSA")
   dat_other  <- dat |> filter(series != "CHELSA")
@@ -209,31 +206,27 @@ make_comp_plot <- function(cv, y_lab, title, post_col, caption_extra = "") {
     scale_fill_manual(  values = c("Posterior" = post_col, "CHELSA" = CHELSA_COL,
                                    "ModE-RA" = MODE_COL_RA, "ModE-Sim" = MODE_COL_SIM),
                         name = NULL) +
-    labs(x = "Century", y = y_lab, title = title,
-         caption = paste0(shared_caption,
-                          if (nchar(caption_extra) > 0) paste0("\n", caption_extra) else "")) +
+    labs(x = "Century", y = y_lab, title = title) +
     guides(colour = guide_legend(nrow = 1), fill = guide_legend(nrow = 1)) +
     theme_tidybayes() +
-    theme(text = element_text(size = 13), plot.title = element_text(face = "bold", size = 14),
+    theme(text = element_text(size = 14), plot.title = element_text(face = "bold", size = 18),
           legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1),
-          plot.caption = element_text(size = 8, hjust = 0), plot.margin = margin(10, 10, 10, 10))
+          plot.margin = margin(10, 10, 10, 10))
 }
 
-p_t <- make_comp_plot("temperature", "Temperature anomaly (°C)",
-                      "Temperature: posterior vs independent model products",
-                      post_col = "#E69F00",
-                      caption_extra = "† ModE-Sim 1800 covers 1800-1849 only.")
+p_t <- make_comp_plot("temperature", "Temperature anomaly (\u00B0C)",
+                      "Temperature anomalies: posterior vs. ModE-RA and ModE-Sim",
+                      post_col = "#E69F00")
 p_p <- make_comp_plot("precipitation", "Precipitation anomaly (%)",
-                      "Precipitation: posterior vs independent model products",
-                      post_col = "skyblue4",
-                      caption_extra = "Restricted to <=1800 (ModE-RA 19th-century artefact).")
+                      "Precipitation anomalies: posterior vs. ModE-RA and ModE-Sim",
+                      post_col = "skyblue4")
 
-p_combined <- (p_t / p_p) +
+p_combined <- (p_t + p_p) +
   plot_annotation(tag_levels = "A") &
-  theme(plot.tag = element_text(face = "bold", size = 14))
+  theme(plot.tag = element_text(face = "bold", size = 16))
 
 ggsave(file.path(out_figures, "ModE_comparison.png"),
-       p_combined, width = 10, height = 16, dpi = 300, bg = "white")
+       p_combined, width = 16, height = 8, dpi = 300, bg = "white")
 
 message("Saved: outputs/figures/ModE_comparison.png")
 message("Saved: outputs/tables/ModE_comparison_*.csv, ModE_ra_sim_gap.csv")

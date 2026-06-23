@@ -108,36 +108,62 @@ make_recon_subplot <- function(results, cv) {
 
   ggplot(recon, aes(x = century)) +
     geom_hline(yintercept = 0, colour = "black", alpha = 0.3) +
-    geom_ribbon(aes(ymin = q025, ymax = q975),
-                fill = post_col, alpha = 0.22, colour = NA) +
-    geom_line(aes(y = chelsa_prior),
-              colour = "grey50", linetype = "dashed", linewidth = 0.9) +
-    geom_point(aes(y = chelsa_prior), colour = "grey50", size = 2.5) +
-    geom_line(aes(y = posterior_median), colour = post_col, linewidth = 1.1) +
-    # Filled circles sized by number of documentary sources
+    # Ribbon mapped to fill scale so it appears in legend
+    geom_ribbon(aes(ymin = q025, ymax = q975,
+                    fill = "Posterior median (shading: 95% CI)"),
+                alpha = 0.22, colour = NA) +
+    # CHELSA prior mapped to colour scale for legend entry
+    geom_line(aes(y = chelsa_prior, colour = "CHELSA prior"),
+              linetype = "dashed", linewidth = 0.9) +
+    geom_point(aes(y = chelsa_prior, colour = "CHELSA prior"), size = 2.5) +
+    # Posterior median mapped to colour scale
+    geom_line(aes(y = posterior_median, colour = "Posterior median (shading: 95% CI)"),
+              linewidth = 1.1) +
+    # Filled circles sized by number of documentary sources (fixed colour, no legend)
     geom_point(data = ~ filter(.x, n_events > 0L),
                aes(y = posterior_median, size = n_events),
                colour = post_col) +
-    # Hollow circles for data-sparse centuries
+    # Hollow circles for data-sparse centuries (fixed colour, no legend)
     geom_point(data = ~ filter(.x, n_events == 0L),
                aes(y = posterior_median),
                shape = 21, size = 2.5,
                colour = post_col, fill = "white", stroke = 1.2) +
+    # n_events labels \u2014 explained in figure caption, not plot.caption
     geom_text(data = ~ filter(.x, n_events > 0L),
               aes(y = posterior_median, label = n_events),
               nudge_y = if (cv == "temperature") 0.15 else 0.4,
               size = 2.8, colour = post_col) +
+    scale_colour_manual(
+      name   = NULL,
+      values = c("CHELSA prior" = "grey50",
+                 "Posterior median (shading: 95% CI)" = post_col)
+    ) +
+    scale_fill_manual(
+      name   = NULL,
+      values = c("Posterior median (shading: 95% CI)" = post_col)
+    ) +
     scale_size_continuous(range = c(2, 5), guide = "none") +
     scale_x_continuous(breaks = seq(1000, 1800, by = 100)) +
-    labs(x = "Century", y = y_lab, title = title,
-         caption = "Grey dashed: CHELSA prior. Point size and label: N documentary sources. Hollow: no sources.") +
+    guides(
+      colour = guide_legend(
+        nrow = 1,
+        override.aes = list(
+          linetype  = c("dashed", "solid"),
+          linewidth = c(0.9, 1.1),
+          shape     = c(16, NA),
+          fill      = c(NA, NA)
+        )
+      ),
+      fill = "none"
+    ) +
+    labs(x = "Century", y = y_lab, title = title) +
     theme_tidybayes() +
     theme(
-      text         = element_text(size = 12),
-      plot.title   = element_text(face = "bold", size = 13),
-      axis.text.x  = element_text(angle = 45, hjust = 1),
-      plot.caption = element_text(size = 7, hjust = 0),
-      plot.margin  = margin(8, 8, 8, 8)
+      text            = element_text(size = 14),
+      plot.title      = element_text(face = "bold", size = 18),
+      axis.text.x     = element_text(angle = 45, hjust = 1),
+      legend.position = "bottom",
+      plot.margin     = margin(8, 8, 8, 8)
     )
 }
 
@@ -164,18 +190,27 @@ make_decomp_plot <- function(decomp, cv) {
     scale_fill_manual(  values = c("CHELSA baseline"   = "#AAAAAA",
                                    "AR(1) persistence" = "#0072B2",
                                    "Innovation"        = "#D55E00")) +
-    labs(x = "Century", y = y_lab, title = title, colour = NULL, fill = NULL,
-         subtitle = "Components sum to \u03b8 at floating-point precision.",
-         caption = "Shading: 95% credible interval per component.") +
-    guides(colour = guide_legend(nrow = 1), fill = guide_legend(nrow = 1)) +
+    labs(x = "Century", y = y_lab, title = title,
+         colour = NULL, fill = NULL,
+         subtitle = "Components sum to \u03b8 at floating-point precision.") +
+    guides(
+      colour = guide_legend(
+        nrow = 1,
+        override.aes = list(
+          fill      = NA,
+          linewidth = 1.0,
+          size      = 3
+        )
+      ),
+      fill = "none"
+    ) +
     theme_tidybayes() +
     theme(
-      plot.title      = element_text(face = "bold", size = 14),
-      plot.subtitle   = element_text(size = 9, colour = "grey45"),
+      plot.title      = element_text(face = "bold", size = 18),
+      plot.subtitle   = element_text(size = 11, colour = "grey45"),
       legend.position = "bottom",
       axis.text.x     = element_text(angle = 45, hjust = 1),
-      plot.caption    = element_text(size = 8, hjust = 0),
-      text            = element_text(size = 13),
+      text            = element_text(size = 14),
       plot.margin     = margin(10, 10, 10, 10)
     )
 }
