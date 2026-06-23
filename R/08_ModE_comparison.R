@@ -226,7 +226,7 @@ p_combined <- (p_t + p_p) +
   theme(plot.tag = element_text(face = "bold", size = 16))
 
 ggsave(file.path(out_figures, "ModE_comparison.png"),
-       p_combined, width = 16, height = 8, dpi = 300, bg = "white")
+       p_combined, width = 17, height = 7, dpi = 300, bg = "white")
 
 message("Saved: outputs/figures/ModE_comparison.png")
 message("Saved: outputs/tables/ModE_comparison_*.csv, ModE_ra_sim_gap.csv")

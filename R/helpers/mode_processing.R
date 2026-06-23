@@ -23,7 +23,6 @@
 # ------------------------------------------------------------------------------
 
 library(here)
-library(ncdf4)
 library(tidyverse)
 
 STUDY_LON <- c(13, 19)
@@ -65,6 +64,8 @@ to_centennial <- function(df, min_years = 50L) {
 # ---- NetCDF helpers (only needed when cache is missing) ----------------------
 
 if (!cache_complete) {
+
+  library(ncdf4)
 
   ra_files <- list(
     temp_mean = file.path(ra_dir, "ModE-RA_ensmean_temp2_anom_wrt_1901-2000_1421-2008_mon.nc"),
