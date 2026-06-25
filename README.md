@@ -173,7 +173,7 @@ Results are saved as per-cell CSVs and combined in `outputs/tables/sensitivity_s
 
 ## Citation
 
-If you use this code or the ArcheoClima database, please cite the paper (still under review) above and the dataset DOI:
+If you use this code or the ArcheoClima database, please cite the paper (still under review) above and the dataset DOI: https://doi.org/10.5281/zenodo.19087807
 
 [![DOI](https://zenodo.org/badge/1185147777.svg)](https://doi.org/10.5281/zenodo.19087807)
 
