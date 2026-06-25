@@ -24,7 +24,8 @@ The model integrates CHELSA-TraCE21k palaeoclimate simulations with Pfister-code
 │   ├── 07_decomposition.R        # AR(1) decomposition of theta into CHELSA / persistence / innovation
 │   ├── 08_ModE_comparison.R      # Compare posterior against ModE-RA and ModE-Sim
 │   ├── checks/
-│   │   └── spatial_representativeness.R  # Full-box vs. Puglia sub-region CHELSA comparison
+│   │   ├── spatial_representativeness.R      # Full-box vs. Puglia sub-region CHELSA comparison
+│   │   └── plot_spatial_representativeness.R # Plots spatial_check.csv as a three-panel figure
 │   └── helpers/
 │       └── mode_processing.R     # NetCDF → centennial means for ModE-RA / ModE-Sim (cached)
 ├── stan/
@@ -60,7 +61,7 @@ install.packages("renv")
 renv::restore()
 ```
 
-Key packages: `tidyverse`, `terra`, `rstan` (≥ 2.21), `ggdist`, `tidybayes`, `patchwork`, `here`, `scales`, `stringr`.
+Key packages: `tidyverse`, `terra`, `rstan` (≥ 2.21), `ggdist`, `tidybayes`, `patchwork`, `maps`, `here`, `scales`, `stringr`.
 
 The ModE-RA / ModE-Sim comparison script (`R/08_ModE_comparison.R`) additionally requires `ncdf4`, which is not part of the core pipeline and must be installed separately if you want to replicate that analysis:
 
@@ -123,6 +124,7 @@ Or step through the scripts in order:
 | 8 | `R/07_decomposition.R` | `outputs/tables/decomposition_*.csv`, `outputs/figures/decomposition_combined.png` |
 | 9 | `R/08_ModE_comparison.R` | `outputs/tables/ModE_comparison_*.csv`, `outputs/figures/ModE_comparison.png` |
 | – | `R/checks/spatial_representativeness.R` | `outputs/tables/spatial_check.csv` |
+| – | `R/checks/plot_spatial_representativeness.R` | `outputs/figures/spatial_representativeness.png` |
 
 **Figure-only shortcuts** (skip Stan): after the core pipeline has been run once, use `R/05b_model_figures_only.R` or `R/06b_sensitivity_figures.R` to regenerate figures from saved results without re-running Stan.
 

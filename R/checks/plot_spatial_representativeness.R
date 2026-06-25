@@ -6,6 +6,7 @@ library(here)
 library(tidyverse)
 library(tidybayes)
 library(patchwork)
+library(maps)
 
 dat <- readr::read_csv(here("outputs", "tables", "spatial_check.csv"),
                        show_col_types = FALSE) |>
@@ -45,6 +46,47 @@ make_panel <- function(dat, y_full, y_puglia, y_lab, title) {
     )
 }
 
+# ── Map panel (context map with both bounding boxes) ───────────────────────
+world_map <- map_data("world") |>
+  filter(long >= 5, long <= 28, lat >= 33, lat <= 50)
+
+p_map <- ggplot() +
+  geom_polygon(data = world_map, aes(x = long, y = lat, group = group),
+               fill = "grey87", colour = "grey55", linewidth = 0.25) +
+  # Full study box
+  annotate("rect",
+           xmin = 13, xmax = 19, ymin = 39.5, ymax = 42,
+           colour = "grey30", fill = "grey30", alpha = 0.20, linewidth = 1.1) +
+  # Puglia sub-region
+  annotate("rect",
+           xmin = 15, xmax = 18.5, ymin = 39.8, ymax = 41.8,
+           colour = "#0072B2", fill = "#0072B2", alpha = 0.30, linewidth = 1.1,
+           linetype = "dashed") +
+  # Labels
+  annotate("text", x = 16, y = 42.55, label = "Full study box",
+           colour = "grey25", size = 3.5, fontface = "bold", hjust = 0.5) +
+  annotate("text", x = 19.4, y = 40.8, label = "Puglia\nsub-region",
+           colour = "#0072B2", size = 3.3, fontface = "bold", hjust = 0, lineheight = 0.9) +
+  annotate("segment", x = 19.2, xend = 18.6, y = 40.8, yend = 40.8,
+           colour = "#0072B2", linewidth = 0.6,
+           arrow = arrow(length = unit(0.15, "cm"), type = "closed")) +
+  coord_cartesian(xlim = c(7, 25), ylim = c(34.5, 47.5)) +
+  scale_x_continuous(breaks = seq(8, 24, by = 4),
+                     labels = paste0(seq(8, 24, by = 4), "°E")) +
+  scale_y_continuous(breaks = seq(36, 46, by = 4),
+                     labels = paste0(seq(36, 46, by = 4), "°N")) +
+  labs(x = NULL, y = NULL, title = "Study region") +
+  theme_tidybayes() +
+  theme(
+    text             = element_text(size = 14),
+    plot.title       = element_text(face = "bold", size = 18),
+    plot.tag         = element_text(face = "bold", size = 16),
+    axis.text        = element_text(size = 9),
+    plot.margin      = margin(10, 10, 10, 10),
+    panel.background = element_rect(fill = "#cde8f5", colour = NA)
+  )
+
+# ── Time-series panels ─────────────────────────────────────────────────────
 p_temp <- make_panel(dat,
   y_full   = "temp_anom_full",
   y_puglia = "temp_anom_puglia",
@@ -57,11 +99,14 @@ p_prec <- make_panel(dat,
   y_lab    = "Precipitation anomaly (%)",
   title    = "Precipitation: full box vs. Puglia sub-region")
 
-p_combined <- (p_temp / p_prec) +
+# ── Assemble ───────────────────────────────────────────────────────────────
+p_combined <- (p_map | p_temp | p_prec) +
+  plot_layout(widths = c(0.75, 1, 1), guides = "collect") +
   plot_annotation(tag_levels = "A") &
-  theme(plot.tag = element_text(face = "bold", size = 16))
+  theme(plot.tag        = element_text(face = "bold", size = 16),
+        legend.position = "bottom")
 
 ggsave(here("outputs", "figures", "spatial_representativeness.png"),
-       p_combined, width = 10, height = 14, dpi = 300, bg = "white")
+       p_combined, width = 22, height = 7, dpi = 300, bg = "white")
 
 message("Saved: outputs/figures/spatial_representativeness.png")
