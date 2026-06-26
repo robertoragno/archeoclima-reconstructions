@@ -181,5 +181,5 @@ If you use this code or the ArcheoClima database, please cite the paper (still u
 
 ## Disclaimer
 
-Given the high volume of work at the moment, the R scripts were refined using an AI tool (Github Copilot) to make sure they are readable and well-commented.
+Given the high volume of work at the moment, the R scripts were refined using an AI tool (Claude Code) to make sure they are readable and well-commented.
 I have fully tested the scripts after refinement, but if you encounter any issues please let me know by opening an issue in this repository.
