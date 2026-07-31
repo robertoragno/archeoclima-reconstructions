@@ -164,6 +164,7 @@ build_stan_data <- function(chelsa_data, documentary_data) {
 #' @param climate_var   `"temperature"` or `"precipitation"`.
 #' @param chains        Number of MCMC chains (default 4).
 #' @param iter          Total iterations per chain including warmup (default 2000).
+#' @param seed          RNG seed passed to Stan, so refits are reproducible.
 #' @return A named list: `fit`, `reconstruction`, `cutpoints`, `ppc_coverage`,
 #'         `rho_posterior`, `stan_input`, `documentary`.
 
@@ -171,7 +172,8 @@ run_model <- function(climate_data,
                       pfister_file,
                       climate_var = "temperature",
                       chains = 4L,
-                      iter   = 2000L) {
+                      iter   = 2000L,
+                      seed   = 20260317L) {
 
   cli_h1 <- function(x) message("\n", strrep("=", 60), "\n  ", x, "\n", strrep("=", 60))
   cli_h2 <- function(x) message("\n-- ", x, " ", strrep("-", max(0, 55 - nchar(x))))
@@ -199,6 +201,7 @@ run_model <- function(climate_data,
     chains  = chains,
     iter    = iter,
     warmup  = iter %/% 2L,
+    seed    = seed,
     control = list(adapt_delta = 0.95),
     verbose = FALSE
   )

@@ -56,6 +56,7 @@ run_sens_cell <- function(climate_var, chelsa_sd_value) {
     chains  = chains,
     iter    = iter,
     warmup  = iter %/% 2L,
+    seed    = 20260317L,
     control = list(adapt_delta = 0.95),
     verbose = FALSE
   )

@@ -23,6 +23,11 @@ for (pkg in required_packages) {
 
 library(here)
 
+# Reproducibility: seeds every R-side RNG draw. Stan's own sampler seed is set
+# per-fit inside run_model() and the sensitivity runner. Note that results are
+# reproducible only for the same Stan/rstan version on the same platform.
+set.seed(20260317L)
+
 # Ensure output directories exist
 for (d in c(
   here("data", "processed"),

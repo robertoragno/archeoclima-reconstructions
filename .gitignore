@@ -7,19 +7,28 @@
 # Large Stan fits
 *.rds
 
-# macOS
+# macOS junk
 .DS_Store
 
-# Manuscript
+# Manuscript (gitignored for journal policy) and reviews
 Manuscript.tex
 Manuscript_v2.tex
+Manuscript_v3.tex
 Reviews.tex
-Reviews.txt
+Reviews_Round_2.tex
 highlights.tex
 
-# Working notes and supplementary draft (gitignored; updated as suggestions evolve)
+# Working notes and supplementary draft (gitignored)
 manuscript_changes.md
 supplementary.tex
+
+# LaTeX build artefacts
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
+*.synctex.gz
 
 # ModE raw NetCDF files (23 GB; download instructions in R/helpers/mode_processing.R)
 data/raw/ModE/
